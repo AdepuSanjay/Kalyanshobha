@@ -1,0 +1,178 @@
+.apc-container {
+    padding: 40px 24px;
+    min-height: calc(100vh - 80px); /* Adjust based on your admin layout */
+    background-color: #F9FAFB;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
+}
+
+.apc-container * {
+    box-sizing: border-box;
+}
+
+.apc-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 900px;
+    border-radius: 16px;
+    padding: 40px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 
+                0 10px 15px -3px rgba(0, 0, 0, 0.05),
+                0 0 0 1px rgba(0,0,0,0.02);
+}
+
+.apc-header {
+    margin-bottom: 32px;
+    border-bottom: 1px solid #F3F4F6;
+    padding-bottom: 24px;
+}
+
+.apc-header h2 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 8px 0;
+}
+
+.apc-header p {
+    color: #6B7280;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* --- Form Controls --- */
+.apc-form-group {
+    margin-bottom: 24px;
+    width: 100%;
+}
+
+.apc-form-group label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.apc-hint {
+    font-weight: 400;
+    color: #9CA3AF;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+.apc-control {
+    width: 100%;
+    padding: 14px 16px;
+    font-family: 'Inter', monospace; /* Monospace is good for typing HTML */
+    font-size: 0.95rem;
+    color: #111827;
+    background-color: #ffffff;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.apc-control:focus {
+    outline: none;
+    border-color: #D32F2F;
+    box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
+}
+
+.apc-select {
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+}
+
+.apc-textarea {
+    resize: vertical;
+    min-height: 300px;
+    line-height: 1.6;
+}
+
+/* --- Loading State --- */
+.apc-loading-skeleton {
+    width: 100%;
+    height: 300px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #F3F4F6 25%, #E5E7EB 50%, #F3F4F6 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9CA3AF;
+    font-weight: 500;
+}
+
+@keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* --- Button --- */
+.apc-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 32px;
+}
+
+.apc-btn-primary {
+    background: #111827;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.apc-btn-primary:hover:not(:disabled) {
+    background: #1F2937;
+}
+
+.apc-btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* --- Proper Mobile Responsiveness --- */
+@media (max-width: 768px) {
+    .apc-container {
+        padding: 20px 12px; /* Reduced outer padding */
+    }
+    
+    .apc-card {
+        padding: 20px; /* Reduced inner padding */
+        border-radius: 12px;
+    }
+
+    .apc-header h2 {
+        font-size: 1.25rem; /* Slightly smaller heading */
+    }
+
+    .apc-hint {
+        display: block; /* Drops hint to next line on small screens */
+        margin-top: 4px;
+    }
+
+    .apc-textarea {
+        min-height: 200px; /* Reduced textarea height for mobile viewports */
+    }
+
+    .apc-footer {
+        justify-content: center;
+    }
+
+    .apc-btn-primary {
+        width: 100%; /* Full width button for easier tapping */
+        padding: 14px 24px;
+    }
+}

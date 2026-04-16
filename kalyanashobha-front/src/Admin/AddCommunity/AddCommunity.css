@@ -1,0 +1,652 @@
+/* --- PREMIUM VARIABLES --- */
+:root {
+  --sys-primary: #D32F2F;
+  --sys-primary-dark: #4338ca;
+  --sys-danger: #ef4444;
+  --sys-danger-dark: #dc2626;
+  --sys-bg: #f8fafc;
+  --sys-card-bg: #ffffff;
+  --sys-text-main: #0f172a;
+  --sys-text-sub: #64748b;
+  --sys-border: #e2e8f0;
+  --sys-border-hover: #cbd5e1;
+  --sys-radius: 12px;
+  --sys-radius-sm: 8px;
+  --sys-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+  --sys-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+  --sys-anim: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==========================================================================
+   Base Layout & Surface 
+   ========================================================================== */
+.sys-cfg-layout {
+  padding: 32px;
+  min-height: 100vh;
+  background-color: var(--sys-bg);
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: var(--sys-text-main);
+  overflow-x: hidden; /* Failsafe to prevent horizontal scrolling */
+}
+  
+.sys-cfg-surface {
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--sys-card-bg);
+  border-radius: var(--sys-radius);
+  box-shadow: var(--sys-shadow-md);
+  padding: 32px;
+  border: 1px solid var(--sys-border);
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+    Controls & Inputs
+    ========================================================================== */
+.sys-cfg-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.sys-cfg-selector-box {
+  width: 100%;
+  max-width: 400px;
+}
+
+.sys-cfg-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sys-text-sub);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+}
+
+.sys-cfg-input-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.sys-cfg-dropdown, 
+.sys-cfg-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--sys-border);
+  border-radius: var(--sys-radius-sm);
+  font-size: 14px;
+  color: var(--sys-text-main);
+  background-color: var(--sys-card-bg);
+  transition: var(--sys-anim);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.sys-cfg-dropdown:focus, 
+.sys-cfg-input:focus {
+  border-color: var(--sys-primary);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.sys-cfg-refresh {
+  background-color: #eff6ff;
+  color: var(--sys-primary);
+  border: 1px solid #dbeafe;
+  border-radius: var(--sys-radius-sm);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--sys-anim);
+  flex-shrink: 0;
+}
+
+.sys-cfg-refresh:hover {
+  background-color: #dbeafe;
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+    Separators & Tabs
+    ========================================================================== */
+.sys-cfg-separator {
+  height: 1px;
+  background-color: var(--sys-border);
+  margin: 24px 0;
+}
+
+.sys-cfg-tab-group {
+  display: inline-flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  gap: 4px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.sys-cfg-tab-group::-webkit-scrollbar { display: none; }
+
+.sys-cfg-tab {
+  padding: 8px 24px;
+  border: none;
+  background: transparent;
+  color: var(--sys-text-sub);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  transition: var(--sys-anim);
+  white-space: nowrap;
+}
+
+.sys-cfg-tab:hover {
+  color: var(--sys-text-main);
+}
+
+.sys-cfg-tab.active {
+  background-color: var(--sys-card-bg);
+  color: var(--sys-text-main);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+}
+
+/* ==========================================================================
+    Tag Input Area (For Nested Items)
+    ========================================================================== */
+.sys-cfg-tag-area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--sys-border);
+  border-radius: var(--sys-radius-sm);
+  min-height: 48px;
+  background-color: var(--sys-card-bg);
+  align-items: center;
+  transition: var(--sys-anim);
+}
+
+.sys-cfg-tag-area:focus-within {
+  border-color: var(--sys-primary);
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.sys-cfg-chip {
+  background-color: #eff6ff;
+  color: var(--sys-primary-dark);
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #dbeafe;
+}
+
+.sys-cfg-chip-close {
+  cursor: pointer;
+  transition: var(--sys-anim);
+}
+
+.sys-cfg-chip-close:hover {
+  color: var(--sys-danger);
+  transform: scale(1.1);
+}
+
+.sys-cfg-tag-input {
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 180px;
+  font-size: 14px;
+  padding: 4px;
+  background: transparent;
+  color: var(--sys-text-main);
+}
+
+/* ==========================================================================
+    Buttons & Loaders
+    ========================================================================== */
+.sys-cfg-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px;
+}
+
+.sys-cfg-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.sys-cfg-btn-primary {
+  background-color: var(--sys-primary);
+  color: #FFFFFF;
+  border: none;
+  padding: 12px 24px;
+  border-radius: var(--sys-radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--sys-anim);
+  box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+  align-self: flex-start;
+}
+
+.sys-cfg-btn-primary:hover:not(:disabled) {
+  background-color: var(--sys-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+}
+
+.sys-cfg-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.sys-cfg-btn-delete {
+  background-color: #fef2f2;
+  color: var(--sys-danger);
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--sys-anim);
+  flex-shrink: 0;
+}
+
+.sys-cfg-btn-delete.mini {
+    width: 28px;
+    height: 28px;
+}
+
+.sys-cfg-btn-delete:hover:not(:disabled) {
+  background-color: var(--sys-danger);
+  color: #FFFFFF;
+  border-color: var(--sys-danger-dark);
+}
+
+.sys-cfg-btn-delete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sys-spin { animation: sys-spin 1s linear infinite; }
+.sys-cfg-loader-ring { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #FFF; animation: sys-spin 1s ease-in-out infinite; }
+.sys-cfg-loader-ring-mini { width: 14px; height: 14px; border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 50%; border-top-color: var(--sys-danger); animation: sys-spin 1s ease-in-out infinite; }
+
+@keyframes sys-spin { 100% { transform: rotate(360deg); } }
+
+/* ==========================================================================
+    Data Grid & DRAG AND DROP STYLES 
+    ========================================================================== */
+.sys-cfg-data-section {
+  margin-top: 48px;
+}
+
+.sys-cfg-data-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sys-cfg-data-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--sys-text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.sys-cfg-page-indicator {
+  font-size: 13px;
+  color: var(--sys-text-sub);
+  font-weight: 600;
+  background-color: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 16px;
+}
+
+.sys-cfg-grid {
+  display: grid;
+  /* Premium setup: Adapts cleanly without breaking borders */
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  align-items: start;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+
+.sys-cfg-is-dragging-over {
+    background-color: rgba(248, 250, 252, 0.6);
+    border-radius: 12px;
+}
+
+.sys-cfg-data-card {
+  background-color: var(--sys-card-bg);
+  border: 1px solid var(--sys-border);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  transition: var(--sys-anim);
+  box-shadow: var(--sys-shadow-sm);
+  box-sizing: border-box; /* Crucial for preventing overflow */
+  width: 100%;
+}
+
+/* --- THE ACTIVE DRAGGING STATE FOR MAIN CARD --- */
+.sys-cfg-dragging {
+  background-color: var(--sys-card-bg) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 2px var(--sys-primary) !important;
+  transform: scale(1.02);
+  border-color: transparent !important;
+  z-index: 9999;
+}
+
+.sys-cfg-data-card:hover:not(.sys-cfg-dragging) {
+  border-color: var(--sys-border-hover);
+  box-shadow: var(--sys-shadow-md);
+  transform: translateY(-2px);
+}
+
+.sys-cfg-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sys-cfg-data-content {
+    display: flex; 
+    align-items: center; 
+    gap: 10px;
+}
+
+/* Professional Drag Handle */
+.sys-cfg-drag-handle {
+    cursor: grab;
+    color: #94a3b8;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--sys-anim);
+    background-color: #f8fafc;
+    border: 1px solid transparent;
+}
+
+.sys-cfg-drag-handle.mini {
+    padding: 4px;
+    background-color: transparent;
+}
+
+.sys-cfg-drag-handle:hover {
+    background-color: #f1f5f9;
+    color: var(--sys-text-main);
+    border-color: var(--sys-border);
+}
+
+.sys-cfg-drag-handle.grabbing {
+    cursor: grabbing !important;
+    background-color: #eff6ff;
+    color: var(--sys-primary);
+    border-color: #dbeafe;
+}
+
+.sys-cfg-record-name {
+  font-weight: 700;
+  color: var(--sys-text-main);
+  font-size: 15px;
+}
+
+.sys-cfg-parent-badge {
+  font-size: 11px; 
+  color: var(--sys-text-sub); 
+  margin-left: 8px; 
+  font-weight: 600;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+/* --- SUB-COMMUNITY DRAG STYLES --- */
+.sys-cfg-sub-container {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--sys-border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 20px; 
+}
+
+.sys-cfg-sub-dragging-over {
+    background-color: #f8fafc;
+    border-radius: 6px;
+}
+
+.sys-cfg-sub-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px 6px 12px;
+    background-color: #f8fafc;
+    border: 1px solid var(--sys-border);
+    border-radius: 6px;
+    transition: var(--sys-anim);
+}
+
+.sys-cfg-sub-item:hover:not(.sys-cfg-sub-dragging) {
+    background-color: var(--sys-card-bg);
+    border-color: var(--sys-border-hover);
+}
+
+/* --- THE ACTIVE DRAGGING STATE FOR SUB CARD --- */
+.sys-cfg-sub-dragging {
+    background-color: var(--sys-card-bg) !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 0 0 1px var(--sys-primary) !important;
+    transform: scale(1.02);
+    border-color: transparent !important;
+    z-index: 9999;
+}
+
+.sys-cfg-sub-item-content {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--sys-text-sub);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sys-cfg-sub-icon {
+    color: #cbd5e1;
+    margin-right: 4px;
+}
+
+.sys-cfg-empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--sys-text-sub);
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px dashed var(--sys-border);
+  font-size: 14px;
+}
+
+/* ==========================================================================
+    Skeleton Loading Animation
+    ========================================================================== */
+.sys-cfg-skeleton-card {
+  background-color: var(--sys-card-bg);
+  border: 1px solid var(--sys-border);
+  border-radius: 10px;
+  padding: 16px;
+  min-height: 70px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: sys-pulse 1.5s infinite;
+}
+
+.sys-cfg-skel-text-main {
+  height: 18px;
+  width: 60%;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+}
+
+.sys-cfg-skel-text-sub {
+  height: 12px;
+  width: 40%;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+}
+
+@keyframes sys-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ==========================================================================
+    Pagination Controls
+    ========================================================================== */
+.sys-cfg-pro-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: var(--sys-radius-sm);
+  border: 1px solid var(--sys-border);
+}
+
+.sys-cfg-page-drop-wrapper {
+  display: inline-block;
+  position: relative;
+}
+
+.sys-cfg-page-numbers-strict {
+  display: flex;
+  gap: 8px;
+}
+
+.sys-cfg-page-num, .sys-cfg-page-btn {
+  touch-action: manipulation; 
+  cursor: pointer;
+  transition: var(--sys-anim);
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 1px solid var(--sys-border);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--sys-text-main);
+}
+
+.sys-cfg-page-btn { padding: 0 16px; gap: 4px; }
+.sys-cfg-page-btn:hover:not(:disabled) { background: #f1f5f9; border-color: var(--sys-border-hover); }
+.sys-cfg-page-btn:disabled { opacity: 0.5; cursor: not-allowed; background: transparent; }
+
+.sys-cfg-page-num:hover:not(.active) { background: #f1f5f9; }
+.sys-cfg-page-num.active { 
+    background: var(--sys-primary); 
+    color: white; 
+    border-color: var(--sys-primary); 
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2); 
+}
+
+/* Premium active drag state for Pagination */
+.drag-target {
+  transform: scale(1.15) translateY(-2px);
+  background-color: var(--sys-text-main) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.3);
+  border-color: var(--sys-text-main) !important;
+}
+
+/* --- SCROLL INDICATOR UI --- */
+.sys-cfg-scroll-indicator {
+  display: none; 
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 30px;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  pointer-events: none; 
+  z-index: 50;
+  animation: bounceSubtle 2s infinite ease-in-out;
+  backdrop-filter: blur(4px);
+}
+@keyframes bounceSubtle {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 6px); }
+}
+
+/* ==========================================================================
+    Mobile Responsiveness (No Horizontal Scroll Guarantee)
+    ========================================================================== */
+@media (max-width: 768px) {
+  .sys-cfg-layout { padding: 16px; }
+  .sys-cfg-surface { padding: 20px; border-radius: 16px; }
+  
+  /* Scroll indicator only visible on small screens */
+  .sys-cfg-scroll-indicator { display: flex; }
+
+  /* Input stacking */
+  .sys-cfg-input-row { flex-direction: column; align-items: stretch; }
+  .sys-cfg-refresh { width: 100%; height: 44px; }
+  .sys-cfg-btn-primary { width: 100%; }
+  
+  /* Tab adjustments */
+  .sys-cfg-tab-group { width: 100%; }
+  .sys-cfg-tab { padding: 8px 16px; font-size: 13px; flex: 1; justify-content: center;}
+
+  /* GRID FIX: Forces a single column to prevent horizontal scroll */
+  .sys-cfg-grid { grid-template-columns: 1fr; width: 100%; box-sizing: border-box; }
+  
+  .sys-cfg-data-card { width: 100%; }
+  
+  .sys-cfg-pro-pagination { flex-wrap: wrap; justify-content: space-between; }
+  .sys-cfg-page-numbers-strict { order: -1; width: 100%; justify-content: center; margin-bottom: 8px; }
+  .sys-cfg-page-drop-wrapper { flex: 1; display: flex;}
+  .sys-cfg-page-btn { width: 100%; }
+}

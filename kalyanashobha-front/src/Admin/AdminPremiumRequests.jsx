@@ -1,0 +1,844 @@
+import React, { useState, useEffect } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+
+// --- ICONS ---
+const Icons = {
+  Crown: () => <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="2 15 7 10 12 16 17 10 22 15 22 20 2 20 2 15"></polygon><line x1="2" y1="20" x2="22" y2="20"></line></svg>,
+  Check: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>,
+  Phone: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>,
+  Clock: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>,
+  Search: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
+  ChevronLeft: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>,
+  ChevronRight: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>,
+  ChevronDown: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+};
+
+const AdminPremiumRequests = () => {
+    const [requests, setRequests] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('Pending');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [processingId, setProcessingId] = useState(null);
+
+    // Fixed Pagination States
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 4; // 4 items for both Desktop and Mobile
+
+    // Global Scroll Indicator State
+    const [showMainScroll, setShowMainScroll] = useState(false);
+
+    const API_URL = "https://kalyanashobha-back.vercel.app/api/admin";
+    const token = localStorage.getItem('adminToken'); 
+
+    useEffect(() => {
+        fetchRequests();
+    }, []);
+
+    // Reset pagination when search or tab changes
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [searchTerm, activeTab]);
+
+    const fetchRequests = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_URL}/premium-requests`, {
+                headers: { 'Authorization': token }
+            });
+            const data = await res.json();
+            if (data.success) {
+                setRequests(data.data);
+            } else {
+                toast.error(data.message || "Failed to fetch requests.");
+            }
+        } catch (error) {
+            toast.error("Network error fetching requests.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateStatus = async (id, newStatus) => {
+        setProcessingId(id);
+        try {
+            const res = await fetch(`${API_URL}/premium-requests/${id}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ status: newStatus })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                toast.success(`Request marked as ${newStatus}`);
+                setRequests(prev => prev.map(req => 
+                    req._id === id ? { ...req, status: newStatus } : req
+                ));
+                window.dispatchEvent(new Event('premiumUpdated'));
+            } else {
+                toast.error(data.message || "Failed to update status.");
+            }
+        } catch (error) {
+            toast.error("Network error while updating.");
+        } finally {
+            setProcessingId(null);
+        }
+    };
+
+    const filteredRequests = requests.filter(req => {
+        // Strictly match the active tab status
+        if (req.status !== activeTab) return false;
+
+        if (searchTerm) {
+            const term = searchTerm.toLowerCase();
+            const fullName = `${req.userId?.firstName || ''} ${req.userId?.lastName || ''}`.toLowerCase();
+            const email = (req.userId?.email || '').toLowerCase();
+            const phone = (req.userId?.mobileNumber || '').toLowerCase();
+            const uniqueId = (req.userId?.uniqueId || '').toLowerCase();
+
+            if (!fullName.includes(term) && !email.includes(term) && !phone.includes(term) && !uniqueId.includes(term)) {
+                return false;
+            }
+        }
+        return true;
+    });
+
+    // Pagination Logic
+    const totalPages = Math.ceil(filteredRequests.length / itemsPerPage) || 1;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = filteredRequests.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handlePageChange = (pageNumber) => {
+        if (pageNumber > 0 && pageNumber <= totalPages) {
+            setCurrentPage(pageNumber);
+        }
+    };
+
+    // Mobile Only Scroll Indicator Logic
+    useEffect(() => {
+        const checkMainScroll = () => {
+            // 1. Hide on desktop entirely (checking for widths > 768px)
+            if (window.innerWidth > 768) {
+                setShowMainScroll(false);
+                return;
+            }
+
+            // 2. Hide if there is 1 or fewer items
+            if (currentItems.length <= 1) {
+                setShowMainScroll(false);
+                return;
+            }
+
+            const scrollY = window.scrollY || document.documentElement.scrollTop;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+
+            // 3. Check if the document is taller than the viewport. 
+            // We use an 80px buffer to account for padding and margins.
+            const isScrollable = documentHeight > windowHeight + 80;
+
+            // 4. Check if we haven't scrolled to the very bottom yet
+            const isNotAtBottom = scrollY + windowHeight < documentHeight - 30;
+
+            // 5. Only show the indicator if it's scrollable AND we aren't at the bottom
+            setShowMainScroll(isScrollable && isNotAtBottom);
+        };
+
+        const timer = setTimeout(checkMainScroll, 50); 
+        window.addEventListener('scroll', checkMainScroll);
+        window.addEventListener('resize', checkMainScroll);
+
+        return () => {
+            clearTimeout(timer);
+            window.removeEventListener('scroll', checkMainScroll);
+            window.removeEventListener('resize', checkMainScroll);
+        };
+    }, [currentItems, currentPage]);
+
+    const formatDate = (dateString) => {
+        const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+        return new Date(dateString).toLocaleDateString('en-IN', options);
+    };
+
+    const StatusBadge = ({ status }) => {
+        let style = {};
+        let Icon = null;
+
+        switch(status) {
+            case 'Pending':
+                style = { bg: '#fffbeb', text: '#b45309', border: '#fde68a' };
+                Icon = Icons.Clock;
+                break;
+            case 'Contacted':
+                style = { bg: '#eff6ff', text: '#1e40af', border: '#dbeafe' };
+                Icon = Icons.Phone;
+                break;
+            case 'Resolved':
+                style = { bg: '#dcfce7', text: '#15803d', border: '#bbf7d0' };
+                Icon = Icons.Check;
+                break;
+            default:
+                style = { bg: '#f8fafc', text: '#64748b', border: '#e2e8f0' };
+        }
+
+        return (
+            <span className="admin-status-badge" style={{
+                backgroundColor: style.bg, color: style.text, border: `1px solid ${style.border}`
+            }}>
+                {Icon && <span className="admin-badge-icon"><Icon /></span>}
+                {status}
+            </span>
+        );
+    };
+
+    return (
+        <div className="admin-layout-container" id="premium-requests-root">
+            <Toaster position="top-right" />
+
+            <style>{`
+                .admin-layout-container {
+                    --pr-primary: #4f46e5;
+                    --pr-primary-dark: #4338ca;
+                    --pr-bg: #f8fafc;
+                    --pr-card-bg: #ffffff;
+                    --pr-text-main: #0f172a;
+                    --pr-text-sub: #64748b;
+                    --pr-border: #e2e8f0;
+                    --pr-border-hover: #cbd5e1;
+                    --pr-radius: 12px;
+                    --pr-radius-sm: 8px;
+                    --pr-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
+                    --pr-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+                    --pr-anim: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+                    padding: 32px !important;
+                    background-color: var(--pr-bg) !important;
+                    min-height: 100vh !important;
+                    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+                    color: var(--pr-text-main) !important;
+                    box-sizing: border-box !important;
+                    max-width: 100vw !important;
+                    overflow-x: hidden !important;
+                }
+
+                /* Header Styles */
+                .admin-header {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 20px !important;
+                    margin-bottom: 24px !important;
+                    box-sizing: border-box !important;
+                }
+                .admin-header-title-group {
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 16px !important;
+                }
+                .admin-header-text h2 {
+                    font-size: 26px !important;
+                    font-weight: 800 !important;
+                    letter-spacing: -0.5px !important;
+                    margin: 0 0 4px 0 !important;
+                    color: var(--pr-text-main) !important;
+                }
+                .admin-header-text p {
+                    color: var(--pr-text-sub) !important;
+                    margin: 0 !important;
+                    font-size: 15px !important;
+                }
+
+                /* Controls (Search & Tabs) */
+                .admin-controls-group {
+                    display: flex !important;
+                    flex-wrap: wrap !important;
+                    gap: 16px !important;
+                    justify-content: space-between !important;
+                    align-items: center !important;
+                    box-sizing: border-box !important;
+                    width: 100% !important;
+                }
+                .admin-search-group {
+                    position: relative !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    flex: 1 !important;
+                    min-width: 250px !important;
+                    max-width: 400px !important;
+                    box-sizing: border-box !important;
+                }
+                .admin-search-group svg {
+                    position: absolute !important;
+                    left: 14px !important;
+                    color: #94a3b8 !important;
+                }
+                .admin-search-input {
+                    width: 100% !important;
+                    padding: 12px 16px 12px 40px !important;
+                    border: 1px solid var(--pr-border) !important;
+                    border-radius: var(--pr-radius-sm) !important;
+                    outline: none !important;
+                    font-size: 14px !important;
+                    box-shadow: var(--pr-shadow-sm) !important;
+                    transition: var(--pr-anim) !important;
+                    box-sizing: border-box !important;
+                }
+                .admin-search-input:focus {
+                    border-color: var(--pr-primary) !important;
+                    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1) !important;
+                }
+
+                /* TABS SCROLLING */
+                .admin-tabs-wrapper {
+                    display: flex !important;
+                    background: #f1f5f9 !important;
+                    padding: 4px !important;
+                    border-radius: 10px !important;
+                    gap: 4px !important;
+                    overflow-x: auto !important;
+                    width: auto !important;
+                    max-width: 100% !important;
+                    box-sizing: border-box !important;
+                    -webkit-overflow-scrolling: touch !important;
+                    scrollbar-width: none !important;
+                }
+                .admin-tabs-wrapper::-webkit-scrollbar { display: none !important; }
+                
+                .admin-tab-button {
+                    flex-shrink: 0 !important;
+                    background: transparent !important;
+                    border: none !important;
+                    padding: 8px 24px !important;
+                    border-radius: 8px !important;
+                    font-size: 14px !important;
+                    font-weight: 600 !important;
+                    color: var(--pr-text-sub) !important;
+                    cursor: pointer !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    gap: 8px !important;
+                    white-space: nowrap !important;
+                    transition: var(--pr-anim) !important;
+                }
+                .admin-tab-button:hover { color: var(--pr-text-main) !important; }
+                .admin-tab-button.active {
+                    background: var(--pr-card-bg) !important;
+                    color: var(--pr-text-main) !important;
+                    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1) !important;
+                }
+                .admin-tab-count {
+                    background: #e2e8f0 !important;
+                    padding: 2px 8px !important;
+                    border-radius: 12px !important;
+                    font-size: 11px !important;
+                }
+                .admin-tab-button.active .admin-tab-count {
+                    background: #dbeafe !important;
+                    color: #1e40af !important;
+                }
+
+                /* Table Styles */
+                .admin-data-card {
+                    background: var(--pr-card-bg) !important;
+                    border: 1px solid var(--pr-border) !important;
+                    border-radius: var(--pr-radius) !important;
+                    box-shadow: var(--pr-shadow-md) !important;
+                    overflow: hidden !important;
+                    box-sizing: border-box !important;
+                    width: 100% !important;
+                }
+                .admin-table-wrapper {
+                    width: 100% !important;
+                    overflow-x: hidden !important;
+                    box-sizing: border-box !important;
+                }
+                .admin-data-table {
+                    width: 100% !important;
+                    border-collapse: collapse !important;
+                    text-align: left !important;
+                    min-width: 100% !important;
+                }
+                .admin-data-table th {
+                    background: #f8fafc !important;
+                    padding: 16px 24px !important;
+                    font-size: 12px !important;
+                    text-transform: uppercase !important;
+                    letter-spacing: 0.8px !important;
+                    color: var(--pr-text-sub) !important;
+                    font-weight: 700 !important;
+                    border-bottom: 1px solid var(--pr-border) !important;
+                }
+                .admin-data-table td {
+                    padding: 20px 24px !important;
+                    border-bottom: 1px solid #f1f5f9 !important;
+                    vertical-align: middle !important;
+                }
+                .admin-data-table tr:last-child td { border-bottom: none !important; }
+                .admin-data-table tr:hover td { background: #f8fafc !important; }
+                
+                .admin-info-stack {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 4px !important;
+                }
+                .admin-info-stack strong { font-size: 14px !important; font-weight: 600 !important; color: var(--pr-text-main) !important; }
+                .admin-text-muted { font-size: 13px !important; color: var(--pr-text-sub) !important; font-family: 'Monaco', monospace !important;}
+                .admin-text-small { font-size: 14px !important; color: var(--pr-text-main) !important; font-weight: 500 !important;}
+                .admin-text-right { text-align: right !important; }
+
+                /* Badges & Buttons */
+                .admin-status-badge {
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    gap: 6px !important;
+                    padding: 6px 12px !important;
+                    border-radius: 20px !important;
+                    font-size: 12px !important;
+                    font-weight: 700 !important;
+                    text-transform: uppercase !important;
+                    letter-spacing: 0.5px !important;
+                }
+                .admin-badge-icon svg { width: 14px !important; height: 14px !important; }
+                
+                .admin-action-group {
+                    display: flex !important;
+                    justify-content: flex-end !important;
+                    gap: 10px !important;
+                }
+                .admin-btn {
+                    display: inline-flex !important; align-items: center !important; justify-content: center !important;
+                    padding: 8px 16px !important;
+                    border-radius: var(--pr-radius-sm) !important;
+                    font-size: 13px !important;
+                    font-weight: 600 !important;
+                    cursor: pointer !important;
+                    border: none !important;
+                    transition: var(--pr-anim) !important;
+                    white-space: nowrap !important;
+                }
+                .admin-btn:disabled { opacity: 0.6 !important; cursor: not-allowed !important; }
+                
+                .admin-btn-primary { background: #eff6ff !important; color: var(--pr-primary-dark) !important; }
+                .admin-btn-primary:hover:not(:disabled) { background: #dbeafe !important; transform: translateY(-1px) !important; }
+                
+                .admin-btn-success { background: #059669 !important; color: #ffffff !important; box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2) !important; }
+                .admin-btn-success:hover:not(:disabled) { background: #047857 !important; transform: translateY(-1px) !important; box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3) !important; }
+                
+                .admin-status-done { color: #94a3b8 !important; font-size: 13px !important; font-weight: 600 !important; padding-right: 8px !important; text-transform: uppercase !important;}
+
+                /* --- NEW CIRCULAR PAGINATION UI --- */
+                .admin-pagination-container {
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    padding: 24px 16px !important;
+                    gap: 24px !important;
+                    background: transparent !important;
+                    border-top: none !important;
+                }
+
+                .admin-page-btn-circle {
+                    width: 44px !important;
+                    height: 44px !important;
+                    border-radius: 50% !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    background: #ffffff !important;
+                    border: 1px solid #e2e8f0 !important;
+                    color: #64748b !important;
+                    cursor: pointer !important;
+                    transition: var(--pr-anim) !important;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.02) !important;
+                }
+
+                .admin-page-btn-circle:hover:not(:disabled) {
+                    background: #f8fafc !important;
+                    color: #0f172a !important;
+                    border-color: #cbd5e1 !important;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+                    transform: translateY(-1px) !important;
+                }
+
+                .admin-page-btn-circle:disabled {
+                    opacity: 0.4 !important;
+                    cursor: not-allowed !important;
+                    background: #f8fafc !important;
+                }
+
+                .admin-page-text {
+                    font-size: 16px !important;
+                    font-weight: 600 !important;
+                    color: #475569 !important;
+                    letter-spacing: 0.3px !important;
+                }
+
+                /* --- SKELETON ANIMATION --- */
+                .admin-skeleton-stack { padding: 24px !important; display: flex !important; flex-direction: column !important; gap: 20px !important; }
+                .admin-skeleton-row { display: flex !important; gap: 24px !important; align-items: center !important; }
+                .admin-sk-box {
+                    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%) !important;
+                    background-size: 200% 100% !important;
+                    animation: shimmer 1.5s infinite !important;
+                    height: 20px !important;
+                    border-radius: 6px !important;
+                }
+                @keyframes shimmer { 0% { background-position: -200% 0 !important; } 100% { background-position: 200% 0 !important; } }
+                .admin-sk-user { width: 180px !important; height: 40px !important; }
+                .admin-sk-contact { width: 150px !important; height: 40px !important;}
+                .admin-sk-loc { width: 120px !important; }
+                .admin-sk-date { width: 120px !important; }
+                .admin-sk-status { width: 90px !important; border-radius: 20px !important;}
+                .admin-sk-action { width: 120px !important; height: 36px !important; margin-left: auto !important; }
+
+                /* Empty States */
+                .admin-state-view {
+                    padding: 60px 24px !important;
+                    display: flex !important; flex-direction: column !important;
+                    align-items: center !important; justify-content: center !important;
+                    color: var(--pr-text-sub) !important; gap: 16px !important;
+                }
+                .admin-state-view.empty svg { width: 48px !important; height: 48px !important; color: #cbd5e1 !important; }
+                .admin-state-view h3 { margin: 0 !important; color: var(--pr-text-main) !important; font-size: 18px !important; }
+
+                /* --- SCROLL INDICATOR UI --- */
+                .admin-scroll-indicator {
+                    position: fixed !important;
+                    bottom: 24px !important;
+                    left: 50% !important;
+                    transform: translateX(-50%) !important;
+                    background: rgba(15, 23, 42, 0.9) !important;
+                    color: white !important;
+                    padding: 8px 16px !important;
+                    border-radius: 30px !important;
+                    align-items: center !important;
+                    gap: 6px !important;
+                    font-size: 13px !important;
+                    font-weight: 600 !important;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+                    pointer-events: none !important; 
+                    z-index: 50 !important;
+                    animation: bounceSubtle 2s infinite ease-in-out !important;
+                    backdrop-filter: blur(4px) !important;
+                    display: flex !important;
+                }
+                @keyframes bounceSubtle {
+                    0%, 100% { transform: translate(-50%, 0) !important; }
+                    50% { transform: translate(-50%, 6px) !important; }
+                }
+
+                /* =========================================================
+                   MOBILE RESPONSIVENESS
+                   ========================================================= */
+                @media (max-width: 768px) {
+                    .admin-layout-container { 
+                        padding: 16px !important; 
+                        width: 100% !important;
+                        overflow-x: hidden !important; 
+                    }
+                    
+                    .admin-header-text h2 { font-size: 22px !important; }
+                    .admin-header-text p { font-size: 14px !important; }
+                    
+                    .admin-controls-group { 
+                        flex-direction: column !important; 
+                        align-items: flex-start !important; 
+                        gap: 12px !important; 
+                        width: 100% !important;
+                    }
+                    
+                    .admin-search-group { 
+                        width: 100% !important; 
+                        max-width: 100% !important; 
+                    }
+
+                    .admin-tabs-wrapper { 
+                        width: 100% !important;
+                        max-width: 100% !important;
+                        gap: 4px !important;
+                        padding: 4px !important;
+                    }
+                    
+                    .admin-tab-button { 
+                        padding: 6px 12px !important; 
+                        font-size: 12px !important; 
+                        gap: 6px !important;
+                    }
+
+                    .admin-tab-count {
+                        padding: 2px 6px !important;
+                        font-size: 10px !important;
+                    }
+
+                    .admin-table-wrapper {
+                        overflow-x: hidden !important; 
+                        width: 100% !important;
+                    }
+
+                    .admin-data-table thead { display: none !important; }
+                    
+                    .admin-data-card { 
+                        background: transparent !important; 
+                        border: none !important; 
+                        box-shadow: none !important; 
+                        width: 100% !important;
+                    }
+                    
+                    .admin-data-table, .admin-data-table tbody, .admin-data-table tr, .admin-data-table td {
+                        display: block !important; width: 100% !important; box-sizing: border-box !important; min-width: unset !important;
+                    }
+                    
+                    .admin-data-table tr {
+                        margin-bottom: 16px !important;
+                        background: var(--pr-card-bg) !important;
+                        border: 1px solid var(--pr-border) !important;
+                        border-radius: var(--pr-radius) !important;
+                        box-shadow: var(--pr-shadow-sm) !important;
+                    }
+                    
+                    .admin-data-table td {
+                        display: flex !important;
+                        justify-content: space-between !important;
+                        align-items: flex-start !important; 
+                        padding: 14px 16px !important;
+                        border-bottom: 1px dashed var(--pr-border) !important;
+                        gap: 12px !important;
+                        text-align: right !important;
+                        word-break: break-word !important;
+                    }
+                    
+                    .admin-data-table td:last-child { 
+                        border-bottom: none !important; 
+                        align-items: center !important;
+                    }
+                    
+                    .admin-data-table td::before {
+                        content: attr(data-label) !important;
+                        font-size: 12px !important;
+                        font-weight: 700 !important;
+                        color: var(--pr-text-sub) !important;
+                        text-transform: uppercase !important;
+                        letter-spacing: 0.5px !important;
+                        flex-shrink: 0 !important;
+                        max-width: 100px !important; 
+                        margin-top: 2px !important;
+                        text-align: left !important;
+                    }
+
+                    .admin-info-stack { 
+                        align-items: flex-end !important; 
+                        text-align: right !important; 
+                        width: calc(100% - 110px) !important; 
+                    }
+                    
+                    .admin-info-stack strong { font-size: 14px !important; }
+                    .admin-text-muted { font-size: 12px !important; }
+                    .admin-text-small { font-size: 14px !important; text-align: right !important;}
+
+                    .admin-status-badge { font-size: 11px !important; padding: 4px 10px !important; }
+                    
+                    .admin-action-group { width: 100% !important; justify-content: flex-end !important; }
+                    .admin-btn { font-size: 13px !important; padding: 8px 16px !important; }
+                    
+                    .admin-pagination-container {
+                        padding: 16px 0 !important;
+                        gap: 16px !important;
+                    }
+                    .admin-page-btn-circle {
+                        width: 40px !important;
+                        height: 40px !important;
+                    }
+                    .admin-page-text {
+                        font-size: 14px !important;
+                    }
+
+                    /* Skeleton Mobile */
+                    .admin-skeleton-stack { padding: 0 !important; }
+                    .admin-skeleton-row { 
+                        flex-direction: column !important; align-items: stretch !important; gap: 12px !important; 
+                        background: var(--pr-card-bg) !important; padding: 16px !important; border-radius: 16px !important; 
+                        border: 1px solid var(--pr-border) !important; margin-bottom: 16px !important;
+                    }
+                    .admin-sk-user, .admin-sk-contact, .admin-sk-loc, .admin-sk-date, .admin-sk-status { width: 100% !important; height: 16px !important; }
+                    .admin-sk-user { height: 32px !important; }
+                    .admin-sk-action { width: 100% !important; height: 36px !important; margin-top: 8px !important; margin-left: 0 !important;}
+                }
+            `}</style>
+
+            <div className="admin-header">
+                <div className="admin-header-title-group">
+                    <div className="admin-header-text">
+                        <h2>Premium Upgrades</h2>
+                        <p>Manage users requesting personalized premium assistance.</p>
+                    </div>
+                </div>
+
+                <div className="admin-controls-group">
+                    <div className="admin-search-group">
+                        <Icons.Search />
+                        <input 
+                            id="premium-search-input"
+                            className="admin-search-input"
+                            type="text" 
+                            placeholder="Search name, ID, or phone..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="admin-tabs-wrapper">
+                        {['Pending', 'Contacted', 'Resolved'].map(tab => (
+                            <button 
+                                key={tab}
+                                id={`filter-tab-${tab.toLowerCase()}`}
+                                className={`admin-tab-button ${activeTab === tab ? 'active' : ''}`}
+                                onClick={() => setActiveTab(tab)}
+                            >
+                                {tab}
+                                <span className="admin-tab-count">
+                                    {requests.filter(r => r.status === tab).length}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="admin-data-card" id="premium-data-view">
+                {loading ? (
+                    <div className="admin-skeleton-stack">
+                        {/* Map array reduced from 6 to 4 to match 4 items per page */}
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="admin-skeleton-row">
+                                <div className="admin-sk-box admin-sk-user"></div>
+                                <div className="admin-sk-box admin-sk-contact"></div>
+                                <div className="admin-sk-box admin-sk-loc"></div>
+                                <div className="admin-sk-box admin-sk-date"></div>
+                                <div className="admin-sk-box admin-sk-status"></div>
+                                <div className="admin-sk-box admin-sk-action"></div>
+                            </div>
+                        ))}
+                    </div>
+                ) : filteredRequests.length === 0 ? (
+                    <div className="admin-state-view empty">
+                        <Icons.Crown />
+                        <h3>No {activeTab.toLowerCase()} requests</h3>
+                        <p>
+                            {searchTerm 
+                                ? `No results match "${searchTerm}" in this tab.` 
+                                : `There are currently no requests awaiting action here.`
+                            }
+                        </p>
+                    </div>
+                ) : (
+                    <>
+                        <div className="admin-table-wrapper">
+                            <table className="admin-data-table">
+                                <thead>
+                                    <tr>
+                                        <th>User Details</th>
+                                        <th>Contact Info</th>
+                                        <th>Location</th>
+                                        <th>Request Date</th>
+                                        <th>Status</th>
+                                        <th className="admin-text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {currentItems.map((req) => (
+                                        <tr key={req._id}>
+                                            <td data-label="User Details">
+                                                <div className="admin-info-stack">
+                                                    <strong>{req.userId?.firstName} {req.userId?.lastName}</strong>
+                                                    <span className="admin-text-muted">{req.userId?.uniqueId}</span>
+                                                </div>
+                                            </td>
+                                            <td data-label="Contact Info">
+                                                <div className="admin-info-stack">
+                                                    <span className="admin-text-small">{req.userId?.mobileNumber}</span>
+                                                    <span className="admin-text-muted">{req.userId?.email}</span>
+                                                </div>
+                                            </td>
+                                            <td data-label="Location">
+                                                <span className="admin-text-small">{req.userId?.city || "N/A"}, {req.userId?.state || "N/A"}</span>
+                                            </td>
+                                            <td data-label="Request Date">
+                                                <span className="admin-text-small">{formatDate(req.requestDate)}</span>
+                                            </td>
+                                            <td data-label="Status">
+                                                <StatusBadge status={req.status} />
+                                            </td>
+                                            <td data-label="Actions" className="admin-text-right">
+                                                <div className="admin-action-group">
+                                                    {req.status === 'Pending' && (
+                                                        <button 
+                                                            className="admin-btn admin-btn-primary"
+                                                            onClick={() => updateStatus(req._id, 'Contacted')}
+                                                            disabled={processingId === req._id}
+                                                        >
+                                                            {processingId === req._id ? 'Processing...' : 'Mark Contacted'}
+                                                        </button>
+                                                    )}
+                                                    {req.status === 'Contacted' && (
+                                                        <button 
+                                                            className="admin-btn admin-btn-success"
+                                                            onClick={() => updateStatus(req._id, 'Resolved')}
+                                                            disabled={processingId === req._id}
+                                                        >
+                                                            {processingId === req._id ? 'Processing...' : 'Mark Resolved'}
+                                                        </button>
+                                                    )}
+                                                    {req.status === 'Resolved' && (
+                                                        <span className="admin-status-done">Done</span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* ALWAYS VISIBLE CIRCULAR PAGINATION DESIGN */}
+                        {totalPages >= 1 && (
+                            <div className="admin-pagination-container">
+                                <button 
+                                    className="admin-page-btn-circle" 
+                                    onClick={() => handlePageChange(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    <Icons.ChevronLeft />
+                                </button>
+
+                                <span className="admin-page-text">
+                                    Page {currentPage} of {totalPages}
+                                </span>
+
+                                <button 
+                                    className="admin-page-btn-circle" 
+                                    onClick={() => handlePageChange(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    <Icons.ChevronRight />
+                                </button>
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+
+            {/* SCROLL INDICATOR */}
+            {showMainScroll && (
+                <div className="admin-scroll-indicator">
+                    <Icons.ChevronDown />
+                    <span>Scroll for more</span>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default AdminPremiumRequests;

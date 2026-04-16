@@ -1,0 +1,680 @@
+/* --- 1. VARIABLES & RESET --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Core Brand Colors */
+  --vp-red: #D32F2F;        
+  --vp-amber: #FFCA28;      
+  --vp-gold-text: #B7791F;  
+
+  /* UI Colors */
+  --vp-bg: #F8F9FA; 
+  --vp-card-bg: #FFFFFF;
+  --vp-text-main: #111827;
+  --vp-text-sub: #6B7280;
+  --vp-border: rgba(17, 24, 39, 0.08); 
+
+  /* Effects */
+  --vp-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+  --vp-hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --vp-radius: 16px; 
+  --vp-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+
+/* Utilities */
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.v-spin { animation: spin 1s linear infinite; }
+
+/* --- 2. LAYOUT CONTAINER --- */
+.v-premium-container {
+  max-width: 1200px;        
+  width: 100%;
+  margin: 90px auto 60px;  
+  padding: 20px 24px !important;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  color: var(--vp-text-main);
+  background-color: var(--vp-bg);
+  display: block;           
+  min-height: 80vh;
+}
+
+/* --- DARK PREMIUM STICKY BANNER --- */
+.v-dark-banner {
+  background: #1e2330;
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: sticky;
+  top: 85px; 
+  z-index: 90;
+}
+
+.v-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.v-banner-icon-box {
+  width: 48px;
+  height: 48px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F59E0B;
+  flex-shrink: 0;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.v-banner-text-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.v-banner-text-col h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.v-banner-text-col p {
+  margin: 4px 0 0 0;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.v-banner-action-btn {
+  background: #ffffff;
+  color: #0f172a;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.v-btn-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.v-banner-action-btn:hover {
+  background: #f1f5f9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255,255,255,0.15);
+}
+
+/* --- 3. HEADER --- */
+.v-premium-header {
+  display: flex;            
+  flex-direction: column;   
+  align-items: center;      
+  justify-content: center;  
+  text-align: center;       
+  margin-bottom: 50px;
+  width: 100%;
+  clear: both;              
+}
+
+.v-premium-header h1 {
+  font-size: 1.8rem; /* Reduced from 2.2rem */
+  font-weight: 700;
+  color: var(--vp-text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 12px 0;
+  position: relative;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.v-premium-header h1::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: var(--vp-amber);
+  margin: 16px auto 0;      
+  border-radius: 4px;
+}
+
+.v-premium-header p {
+  font-size: 1.1rem;
+  color: var(--vp-text-sub);
+  max-width: 600px;
+  margin: 0 auto;           
+  line-height: 1.6;
+}
+
+/* --- 4. GRID SYSTEM --- */
+.v-premium-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Reduced from 260px */
+  gap: 32px;
+  width: 100%;
+  justify-items: center; 
+}
+
+.v-no-data {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px;
+  border: 1px dashed var(--vp-border);
+  border-radius: var(--vp-radius);
+  color: var(--vp-text-sub);
+  background: transparent;
+  width: 100%;
+}
+
+/* --- 5. CARD DESIGN --- */
+.v-premium-card {
+  background: var(--vp-card-bg);
+  border: 1px solid var(--vp-border);
+  border-radius: var(--vp-radius);
+  overflow: hidden;
+  transition: var(--vp-transition);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100%; 
+  width: 100%;
+  max-width: 280px; /* Reduced from 320px */
+  box-shadow: var(--vp-shadow);
+}
+
+.v-premium-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--vp-hover-shadow);
+  border-color: rgba(17, 24, 39, 0.12); 
+}
+
+.v-card-image {
+  height: 180px; /* Reduced from 220px to match narrower card width */
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background: #f3f4f6;
+  flex-shrink: 0; 
+}
+
+.v-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+  object-position: top center; 
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+}
+
+.v-premium-card:hover .v-card-image img {
+  transform: scale(1.06); 
+}
+
+.v-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.v-badge-category {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--vp-amber);
+  color: #111827;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  z-index: 10;
+}
+
+.v-card-content {
+  padding: 24px;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.v-card-title {
+  font-size: 1.15rem; 
+  font-weight: 700;
+  color: var(--vp-text-main);
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+}
+
+.v-card-desc {
+  font-size: 0.9rem; 
+  color: var(--vp-text-sub);
+  margin-bottom: 24px;
+  line-height: 1.6;
+  flex-grow: 1;
+}
+
+/* --- 6. BUTTONS (PREMIUM STYLING) --- */
+.v-contact-btn {
+  width: 100%;
+  padding: 12px; 
+  margin-top: auto;
+  background-color: #1e2330; 
+  color: var(--vp-amber); 
+  border: 1px solid rgba(255, 202, 40, 0.3); 
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--vp-transition);
+  font-family: 'Poppins', sans-serif;
+}
+
+.v-contact-btn:hover {
+  background-color: #0f172a;
+  box-shadow: 0 6px 16px rgba(255, 202, 40, 0.15);
+}
+
+/* --- 7. MODALS --- */
+.v-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh; 
+  background-color: rgba(17, 24, 39, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.v-modal-content {
+  background-color: white;
+  width: 100%;
+  max-width: 480px;
+  padding: 35px 32px;
+  border-radius: 20px;
+  position: relative;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  max-height: 90dvh; 
+  overflow-y: auto;
+  margin: auto; 
+}
+
+.v-modal-large {
+  max-width: 600px;
+}
+
+.v-modal-content h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.5rem;
+  color: var(--vp-text-main);
+  font-weight: 700;
+}
+
+.v-modal-content p {
+  margin: 0 0 24px 0;
+  font-size: 0.95rem;
+  color: var(--vp-text-sub);
+}
+
+.v-modal-close {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: #f3f4f6;
+  border: none;
+  cursor: pointer;
+  color: var(--vp-text-sub);
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--vp-transition);
+}
+
+.v-modal-close:hover {
+  background: #e5e7eb;
+  color: var(--vp-text-main);
+  transform: rotate(90deg);
+}
+
+.v-lead-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.v-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.v-lead-form input,
+.v-lead-form textarea,
+.v-lead-form select {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--vp-border);
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  background: #f9fafb;
+  transition: var(--vp-transition);
+}
+
+.v-lead-form input:focus,
+.v-lead-form textarea:focus,
+.v-lead-form select:focus {
+  outline: none;
+  border-color: var(--vp-text-main);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.05);
+}
+
+.v-file-upload {
+  padding: 20px;
+  border: 2px dashed #d1d5db;
+  border-radius: 10px;
+  background: #f9fafb;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--vp-transition);
+}
+
+.v-file-upload:hover {
+  border-color: var(--vp-text-main);
+  background: #fff;
+}
+
+.v-submit-btn {
+  padding: 16px;
+  background-color: #1e2330;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--vp-transition);
+  margin-top: 8px;
+  width: 100%;
+}
+
+.v-submit-btn:hover:not(:disabled) {
+  background-color: #0f172a;
+  box-shadow: 0 6px 16px rgba(17, 24, 39, 0.2);
+}
+
+.v-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.v-success-message {
+  padding: 24px;
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.v-error-message {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: -8px;
+}
+
+/* --- 8. PREMIUM SKELETON ANIMATION --- */
+@keyframes shimmer-sweep {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.v-skeleton-wrapper {
+  cursor: default;
+  pointer-events: none; 
+}
+
+.shimmer {
+  animation: shimmer-sweep 2s infinite linear;
+  background: #f6f7f8;
+  background: linear-gradient(to right, #f0f0f0 8%, #e0e0e0 18%, #f0f0f0 33%);
+  background-size: 1000px 100%;
+}
+
+.v-skeleton-img {
+  height: 180px; /* Reduced from 220px to match new image height */
+  width: 100%;
+}
+
+.v-skeleton-title {
+  height: 22px;
+  width: 65%;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  margin-top: 4px;
+}
+
+.v-skeleton-text {
+  height: 14px;
+  width: 100%;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.v-skeleton-text.short {
+  width: 40%;
+  margin-bottom: 30px;
+}
+
+.v-skeleton-btn {
+  height: 44px;
+  width: 100%;
+  border-radius: 10px;
+  margin-top: auto;
+}
+
+/* --- 9. RESPONSIVE (MOBILE OPTIMIZED) --- */
+@media (max-width: 768px) {
+  .v-premium-container {
+    padding: 16px 12px !important; 
+    margin-top: 75px;
+  }
+
+  /* --- HORIZONTAL INLINE BANNER --- */
+  .v-dark-banner {
+    flex-direction: row; 
+    padding: 12px; 
+    gap: 12px;
+    top: 70px;
+    align-items: center;
+    border-radius: 10px;
+  }
+
+  .v-banner-left {
+    flex-direction: row; 
+    text-align: left;
+    gap: 10px;
+    flex: 1; 
+    min-width: 0; 
+  }
+
+  .v-banner-icon-box {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+    border-radius: 8px;
+  }
+
+  .v-banner-text-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .v-banner-text-col h3 {
+    font-size: 0.85rem; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .v-banner-text-col p {
+    font-size: 0.65rem; 
+    line-height: 1.2;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; 
+  }
+
+  .v-banner-action-btn {
+    width: auto;
+    justify-content: center;
+    padding: 8px 12px; 
+    font-size: 0.75rem;
+    gap: 4px;
+    flex-shrink: 0; 
+  }
+
+  .v-btn-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .v-premium-header h1 {
+    font-size: 1.1rem; /* Reduced from 1.2rem for mobile */
+  }
+
+  .v-premium-header p {
+    font-size: 0.75rem; 
+    padding: 0 10px;
+  }
+
+  /* Reduce Mobile Card Width and Center */
+  .v-premium-grid {
+    grid-template-columns: 1fr; 
+    gap: 20px; 
+    justify-items: center; 
+  }
+
+  .v-premium-card {
+    max-width: 280px; /* Reduced from 320px */
+    width: 100%;
+  }
+
+  .v-card-image {
+    height: 180px; /* Reduced from 200px */
+  }
+
+  .v-card-content {
+    padding: 16px; 
+  }
+
+  .v-card-title {
+    font-size: 0.95rem; 
+  }
+
+  .v-card-desc {
+    font-size: 0.75rem; 
+    margin-bottom: 12px;
+  }
+
+  .v-contact-btn {
+    font-size: 0.8rem;
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  /* --- STRICT CENTERED MODAL --- */
+  .v-modal-overlay {
+    padding: 16px; 
+    align-items: center; 
+    justify-content: center;
+  }
+
+  .v-modal-content {
+    padding: 20px 16px; 
+    width: 100%;
+    max-height: 85dvh; 
+    border-radius: 12px; 
+    overflow-y: auto;
+    margin: 0; 
+  }
+
+  .v-modal-content h2 {
+    font-size: 1.05rem; 
+    margin-right: 20px; 
+  }
+
+  .v-modal-content p {
+    font-size: 0.7rem; 
+    margin-bottom: 12px;
+  }
+
+  .v-modal-close {
+    top: 14px;
+    right: 14px;
+    padding: 4px; 
+  }
+
+  .v-form-grid {
+    grid-template-columns: 1fr; 
+    gap: 8px; 
+  }
+
+  .v-lead-form {
+    gap: 8px; 
+  }
+
+  .v-lead-form input,
+  .v-lead-form textarea,
+  .v-lead-form select {
+    font-size: 0.75rem; 
+    padding: 8px 10px; 
+    border-radius: 8px;
+  }
+
+  .v-file-upload {
+    padding: 10px; 
+    font-size: 0.75rem;
+  }
+
+  .v-submit-btn {
+    font-size: 0.8rem;
+    padding: 12px;
+    margin-top: 4px;
+    border-radius: 8px;
+  }
+}
